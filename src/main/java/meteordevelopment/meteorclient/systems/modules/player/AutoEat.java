@@ -185,7 +185,7 @@ public class AutoEat extends Module {
         if (pauseBaritone.get()) {
             if (PathManagers.get().isPathing()) {
                 wasBaritone = true;
-                PathManagers.get().getPrimary().getBaritone().getCommandManager().execute("pause");
+                PathManagers.get().pause();
             }
         }
     }
@@ -217,7 +217,7 @@ public class AutoEat extends Module {
 
         // Resume baritone
         if (pauseBaritone.get() && wasBaritone) {
-            PathManagers.get().getPrimary().getBaritone().getCommandManager().execute("resume");
+            PathManagers.get().resume();
             wasBaritone = false;
         }
     }
