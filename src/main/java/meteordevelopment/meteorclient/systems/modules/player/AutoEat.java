@@ -44,7 +44,7 @@ public class AutoEat extends Module {
     private final SettingGroup sgThreshold = settings.createGroup("Threshold");
 
     // General
-    public final Setting < List < Item >> blacklist = sgGeneral.add(new ItemListSetting.Builder()
+    public final Setting<List<Item>> blacklist = sgGeneral.add(new ItemListSetting.Builder()
         .name("blacklist")
         .description("Which items to not eat.")
         .defaultValue(
@@ -62,14 +62,14 @@ public class AutoEat extends Module {
         .build()
     );
 
-    private final Setting < Boolean > pauseModules = sgGeneral.add(new BoolSetting.Builder()
+    private final Setting<Boolean> pauseModules = sgGeneral.add(new BoolSetting.Builder()
         .name("pause-modules")
         .description("Pauses Auras, Nuker, InfinityMiner and AutoFish when eating.")
         .defaultValue(true)
         .build()
     );
 
-    private final Setting < Boolean > pauseBaritone = sgGeneral.add(new BoolSetting.Builder()
+    private final Setting<Boolean> pauseBaritone = sgGeneral.add(new BoolSetting.Builder()
         .name("pause-baritone")
         .description("Pause baritone when eating.")
         .defaultValue(true)
@@ -77,14 +77,14 @@ public class AutoEat extends Module {
     );
 
     // Threshold
-    private final Setting < ThresholdMode > thresholdMode = sgThreshold.add(new EnumSetting.Builder < ThresholdMode > ()
+    private final Setting<ThresholdMode> thresholdMode = sgThreshold.add(new EnumSetting.Builder<ThresholdMode>()
         .name("threshold-mode")
         .description("The threshold mode to trigger auto eat.")
         .defaultValue(ThresholdMode.Any)
         .build()
     );
 
-    private final Setting < Double > healthThreshold = sgThreshold.add(new DoubleSetting.Builder()
+    private final Setting<Double> healthThreshold = sgThreshold.add(new DoubleSetting.Builder()
         .name("health-threshold")
         .description("The level of health you eat at.")
         .defaultValue(10)
@@ -94,7 +94,7 @@ public class AutoEat extends Module {
         .build()
     );
 
-    private final Setting < Integer > hungerThreshold = sgThreshold.add(new IntSetting.Builder()
+    private final Setting<Integer> hungerThreshold = sgThreshold.add(new IntSetting.Builder()
         .name("hunger-threshold")
         .description("The level of hunger you eat at.")
         .defaultValue(16)
@@ -108,7 +108,7 @@ public class AutoEat extends Module {
     public boolean eating;
     private int slot, prevSlot;
 
-    private final List < Class << ? extends Module >> wasAura = new ArrayList < > ();
+    private final List<Class<? extends Module>> wasAura = new ArrayList<>();
     private boolean wasBaritone = false;
 
     public AutoEat() {
@@ -171,7 +171,7 @@ public class AutoEat extends Module {
 
         wasAura.clear();
         if (pauseModules.get()) {
-            for (Class << ? extends Module > klass : MODULELIST) {
+            for (Class<? extends Module> klass : MODULELIST) {
                 Module module = Modules.get().get(klass);
 
                 if (module.isActive()) {
@@ -206,7 +206,7 @@ public class AutoEat extends Module {
 
         // Resume auras
         if (pauseModules.get()) {
-            for (Class << ? extends Module > klass : MODULELIST) {
+            for (Class<? extends Module> klass : MODULELIST) {
                 Module module = Modules.get().get(klass);
 
                 if (wasAura.contains(klass) && !module.isActive()) {
@@ -281,9 +281,9 @@ public class AutoEat extends Module {
             Any((health, hunger) -> health || hunger),
             Both((health, hunger) -> health && hunger);
 
-        private final BiPredicate < Boolean, Boolean > predicate;
+        private final BiPredicate<Boolean, Boolean> predicate;
 
-        ThresholdMode(BiPredicate < Boolean, Boolean > predicate) {
+        ThresholdMode(BiPredicate<Boolean, Boolean> predicate) {
             this.predicate = predicate;
         }
 
