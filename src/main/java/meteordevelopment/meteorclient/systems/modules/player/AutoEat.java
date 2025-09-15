@@ -16,6 +16,9 @@ import meteordevelopment.meteorclient.systems.modules.combat.AnchorAura;
 import meteordevelopment.meteorclient.systems.modules.combat.BedAura;
 import meteordevelopment.meteorclient.systems.modules.combat.CrystalAura;
 import meteordevelopment.meteorclient.systems.modules.combat.KillAura;
+import meteordevelopment.meteorclient.systems.modules.world.Nuker;
+import meteordevelopment.meteorclient.systems.modules.world.InfinityMiner;
+import meteordevelopment.meteorclient.systems.modules.player.AutoFish;
 import meteordevelopment.meteorclient.utils.Utils;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.player.SlotUtils;
@@ -32,14 +35,16 @@ import java.util.function.BiPredicate;
 
 public class AutoEat extends Module {
     @SuppressWarnings("unchecked")
-    private static final Class<? extends Module>[] AURAS = new Class[]{ KillAura.class, CrystalAura.class, AnchorAura.class, BedAura.class };
+    private static final Class << ? extends Module > [] MODULELIST = new Class[] {
+        KillAura.class, CrystalAura.class, AnchorAura.class, BedAura.class, Nuker.class, InfinityMiner.class, AutoFish.class
+    };
 
     // Settings groups
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgThreshold = settings.createGroup("Threshold");
 
     // General
-    public final Setting<List<Item>> blacklist = sgGeneral.add(new ItemListSetting.Builder()
+    public final Setting < List < Item >> blacklist = sgGeneral.add(new ItemListSetting.Builder()
         .name("blacklist")
         .description("Which items to not eat.")
         .defaultValue(
@@ -53,18 +58,18 @@ public class AutoEat extends Module {
             Items.SPIDER_EYE,
             Items.SUSPICIOUS_STEW
         )
-        .filter(item -> item.getComponents().get(DataComponentTypes.FOOD) != null)
+        .filter(item - > item.getComponents().get(DataComponentTypes.FOOD) != null)
         .build()
     );
 
-    private final Setting<Boolean> pauseAuras = sgGeneral.add(new BoolSetting.Builder()
-        .name("pause-auras")
-        .description("Pauses all auras when eating.")
+    private final Setting < Boolean > pauseModules = sgGeneral.add(new BoolSetting.Builder()
+        .name("pause-modules")
+        .description("Pauses Auras, Nuker, InfinityMiner and AutoFish when eating.")
         .defaultValue(true)
         .build()
     );
 
-    private final Setting<Boolean> pauseBaritone = sgGeneral.add(new BoolSetting.Builder()
+    private final Setting < Boolean > pauseBaritone = sgGeneral.add(new BoolSetting.Builder()
         .name("pause-baritone")
         .description("Pause baritone when eating.")
         .defaultValue(true)
@@ -72,30 +77,30 @@ public class AutoEat extends Module {
     );
 
     // Threshold
-    private final Setting<ThresholdMode> thresholdMode = sgThreshold.add(new EnumSetting.Builder<ThresholdMode>()
+    private final Setting < ThresholdMode > thresholdMode = sgThreshold.add(new EnumSetting.Builder < ThresholdMode > ()
         .name("threshold-mode")
         .description("The threshold mode to trigger auto eat.")
         .defaultValue(ThresholdMode.Any)
         .build()
     );
 
-    private final Setting<Double> healthThreshold = sgThreshold.add(new DoubleSetting.Builder()
+    private final Setting < Double > healthThreshold = sgThreshold.add(new DoubleSetting.Builder()
         .name("health-threshold")
         .description("The level of health you eat at.")
         .defaultValue(10)
         .range(1, 19)
         .sliderRange(1, 19)
-        .visible(() -> thresholdMode.get() != ThresholdMode.Hunger)
+        .visible(() - > thresholdMode.get() != ThresholdMode.Hunger)
         .build()
     );
 
-    private final Setting<Integer> hungerThreshold = sgThreshold.add(new IntSetting.Builder()
+    private final Setting < Integer > hungerThreshold = sgThreshold.add(new IntSetting.Builder()
         .name("hunger-threshold")
         .description("The level of hunger you eat at.")
         .defaultValue(16)
         .range(1, 19)
         .sliderRange(1, 19)
-        .visible(() -> thresholdMode.get() != ThresholdMode.Health)
+        .visible(() - > thresholdMode.get() != ThresholdMode.Health)
         .build()
     );
 
@@ -103,7 +108,7 @@ public class AutoEat extends Module {
     public boolean eating;
     private int slot, prevSlot;
 
-    private final List<Class<? extends Module>> wasAura = new ArrayList<>();
+    private final List < Class << ? extends Module >> wasAura = new ArrayList < > ();
     private boolean wasBaritone = false;
 
     public AutoEat() {
@@ -164,10 +169,9 @@ public class AutoEat extends Module {
         prevSlot = mc.player.getInventory().getSelectedSlot();
         eat();
 
-        // Pause auras
         wasAura.clear();
-        if (pauseAuras.get()) {
-            for (Class<? extends Module> klass : AURAS) {
+        if (pauseModules.get()) {
+            for (Class << ? extends Module > klass : MODULELIST) {
                 Module module = Modules.get().get(klass);
 
                 if (module.isActive()) {
@@ -178,9 +182,11 @@ public class AutoEat extends Module {
         }
 
         // Pause baritone
-        if (pauseBaritone.get() && PathManagers.get().isPathing() && !wasBaritone) {
-            wasBaritone = true;
-            PathManagers.get().pause();
+        if (pauseBaritone.get()) {
+            if (PathManagers.get().isPathing()) {
+                wasBaritone = true;
+                PathManagers.get().getPrimary().getBaritone().getCommandManager().execute("pause");
+            }
         }
     }
 
@@ -199,8 +205,8 @@ public class AutoEat extends Module {
         eating = false;
 
         // Resume auras
-        if (pauseAuras.get()) {
-            for (Class<? extends Module> klass : AURAS) {
+        if (pauseModules.get()) {
+            for (Class << ? extends Module > klass : MODULELIST) {
                 Module module = Modules.get().get(klass);
 
                 if (wasAura.contains(klass) && !module.isActive()) {
@@ -211,8 +217,8 @@ public class AutoEat extends Module {
 
         // Resume baritone
         if (pauseBaritone.get() && wasBaritone) {
+            PathManagers.get().getPrimary().getBaritone().getCommandManager().execute("resume");
             wasBaritone = false;
-            PathManagers.get().resume();
         }
     }
 
@@ -234,8 +240,8 @@ public class AutoEat extends Module {
         FoodComponent food = mc.player.getInventory().getStack(slot).get(DataComponentTypes.FOOD);
         if (food == null) return false;
 
-        return thresholdMode.get().test(healthLow, hungerLow)
-            && (mc.player.getHungerManager().isNotFull() ||  food.canAlwaysEat());
+        return thresholdMode.get().test(healthLow, hungerLow) &&
+            (mc.player.getHungerManager().isNotFull() || food.canAlwaysEat());
     }
 
     private int findSlot() {
@@ -270,14 +276,14 @@ public class AutoEat extends Module {
     }
 
     public enum ThresholdMode {
-        Health((health, hunger) -> health),
-        Hunger((health, hunger) -> hunger),
-        Any((health, hunger) -> health || hunger),
-        Both((health, hunger) -> health && hunger);
+        Health((health, hunger) - > health),
+            Hunger((health, hunger) - > hunger),
+            Any((health, hunger) - > health || hunger),
+            Both((health, hunger) - > health && hunger);
 
-        private final BiPredicate<Boolean, Boolean> predicate;
+        private final BiPredicate < Boolean, Boolean > predicate;
 
-        ThresholdMode(BiPredicate<Boolean, Boolean> predicate) {
+        ThresholdMode(BiPredicate < Boolean, Boolean > predicate) {
             this.predicate = predicate;
         }
 
