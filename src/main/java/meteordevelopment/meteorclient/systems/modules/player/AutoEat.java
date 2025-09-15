@@ -35,7 +35,7 @@ import java.util.function.BiPredicate;
 
 public class AutoEat extends Module {
     @SuppressWarnings("unchecked")
-    private static final Class << ? extends Module > [] MODULELIST = new Class[] {
+    private static final Class<? extends Module>[] MODULELIST = new Class[] {
         KillAura.class, CrystalAura.class, AnchorAura.class, BedAura.class, Nuker.class, InfinityMiner.class, AutoFish.class
     };
 
@@ -58,7 +58,7 @@ public class AutoEat extends Module {
             Items.SPIDER_EYE,
             Items.SUSPICIOUS_STEW
         )
-        .filter(item - > item.getComponents().get(DataComponentTypes.FOOD) != null)
+        .filter(item -> item.getComponents().get(DataComponentTypes.FOOD) != null)
         .build()
     );
 
@@ -90,7 +90,7 @@ public class AutoEat extends Module {
         .defaultValue(10)
         .range(1, 19)
         .sliderRange(1, 19)
-        .visible(() - > thresholdMode.get() != ThresholdMode.Hunger)
+        .visible(() -> thresholdMode.get() != ThresholdMode.Hunger)
         .build()
     );
 
@@ -100,7 +100,7 @@ public class AutoEat extends Module {
         .defaultValue(16)
         .range(1, 19)
         .sliderRange(1, 19)
-        .visible(() - > thresholdMode.get() != ThresholdMode.Health)
+        .visible(() -> thresholdMode.get() != ThresholdMode.Health)
         .build()
     );
 
@@ -276,10 +276,10 @@ public class AutoEat extends Module {
     }
 
     public enum ThresholdMode {
-        Health((health, hunger) - > health),
-            Hunger((health, hunger) - > hunger),
-            Any((health, hunger) - > health || hunger),
-            Both((health, hunger) - > health && hunger);
+        Health((health, hunger) -> health),
+            Hunger((health, hunger) -> hunger),
+            Any((health, hunger) -> health || hunger),
+            Both((health, hunger) -> health && hunger);
 
         private final BiPredicate < Boolean, Boolean > predicate;
 
